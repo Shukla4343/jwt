@@ -19,6 +19,19 @@ const gnerateToken = (user)=>{
         {expiresIn: process.env.JWT_EXPIRE_TIME}
     );
 };
+app.post('/signup', async(req,res)=>{
+    const { username, passowrd} = req.body;
+    const existingUser = user.find(u => u.username === username);
+    if(existingUser){
+        return res.status(400).json({message: 'username already taken'});
+
+    }
+    const hashedPassword = await bcrypt.hash(passowrd,10);
+    const newUser = {id: Date.now(), username, passowrd: hashedPassword};
+    user.push(newUser);
+    const token = gnerateToken(newUser);
+    return res.status(201).json({token});
+});
  
 //LOGIN ROUTE START HERE
 app.post('/login',async(req,res)=>{
